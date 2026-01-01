@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>등록된 화분 보기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: linear-gradient(140deg, #f7f7ff 0%, #e6f6f3 45%, #e8f0ff 100%);
+      --card: #ffffff;
+      --accent: #0f766e;
+      --text: #0f172a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --shadow: 0 15px 45px rgba(15, 23, 42, 0.12);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--text);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+    h1 { margin: 0; font-size: 20px; }
+    .hint { color: var(--muted); font-size: 13px; }
+    .btn {
+      border: 1px solid var(--border);
+      background: #0f766e;
+      color: #ecfeff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(15, 118, 110, 0.25);
+    }
+    .secondary {
+      background: #fff;
+      color: var(--text);
+      box-shadow: none;
+    }
+    .grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .photos { display: flex; gap: 6px; flex-wrap: wrap; }
+    .thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #ecfeff;
+      color: #0e7490;
+      border: 1px solid #bae6fd;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .meta { display: flex; flex-direction: column; gap: 4px; }
+    .title { font-size: 16px; font-weight: 700; margin: 0; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .empty { text-align: center; padding: 40px 12px; color: var(--muted); }
+    .bar { display: flex; gap: 8px; align-items: center; }
+    .pill { padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: #f8fafc; font-weight: 600; font-size: 12px; }
+    a { color: inherit; text-decoration: none; }
+    @media (max-width: 640px) {
+      header { flex-direction: column; align-items: flex-start; }
+      .bar { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>등록된 화분 보기</h1>
+      <div class="hint">누구나 현재 올라온 화분/화환을 확인할 수 있어요.</div>
+    </div>
+    <div class="bar">
+      <a class="btn secondary" href="/index.html">등록하기</a>
+      <button class="btn" id="refresh">새로고침</button>
+    </div>
+  </header>
+
+  <div id="grid" class="grid"></div>
+
+  <script>
+    const grid = document.getElementById('grid');
+    const refreshBtn = document.getElementById('refresh');
+
+    refreshBtn.addEventListener('click', load);
+    load();
+
+    async function load() {
+      grid.innerHTML = '<div class="empty">불러오는 중...</div>';
+      try {
+        const res = await fetch('/api/pots');
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || '조회 실패');
+        render(data.data || []);
+      } catch (err) {
+        grid.innerHTML = `<div class="empty">${err.message || '목록을 불러올 수 없습니다.'}</div>`;
+      }
+    }
+
+    function render(items) {
+      if (!items.length) {
+        grid.innerHTML = '<div class="empty">아직 등록된 화분이 없습니다.</div>';
+        return;
+      }
+      grid.innerHTML = '';
+      items.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const title = document.createElement('p');
+        title.className = 'title';
+        title.textContent = `${item.location} · ${item.qty}개`;
+
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = item.intent === 'open' ? '제안 받아요' : '그냥 가져가세요';
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const date = document.createElement('span');
+        date.className = 'muted';
+        date.textContent = new Date(item.created_at).toLocaleString();
+        meta.appendChild(date);
+
+        const photos = document.createElement('div');
+        photos.className = 'photos';
+        let names = [];
+        try { names = JSON.parse(item.photos || '[]'); } catch (_) { names = []; }
+        if (!Array.isArray(names)) names = [];
+        if (names.length === 0) {
+          const none = document.createElement('span');
+          none.className = 'muted';
+          none.textContent = '사진 없음';
+          photos.appendChild(none);
+        } else {
+          names.forEach((n) => {
+            const img = document.createElement('img');
+            img.className = 'thumb';
+            img.src = `/uploads/${n}`;
+            img.alt = n;
+            photos.appendChild(img);
+          });
+        }
+
+        card.appendChild(title);
+        card.appendChild(badge);
+        card.appendChild(meta);
+        card.appendChild(photos);
+        grid.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>

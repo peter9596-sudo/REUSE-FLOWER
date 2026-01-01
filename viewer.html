@@ -84,6 +84,7 @@
       background: #fff;
       cursor: zoom-in;
     }
+    .thumb-wrap { position: relative; display: inline-block; }
     .badge {
       display: inline-flex;
       align-items: center;
@@ -106,19 +107,19 @@
     .lightbox {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.72);
+      background: rgba(0,0,0,0.76);
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 16px;
-      z-index: 20;
+      padding: 20px;
+      z-index: 999;
     }
     .lightbox.open { display: flex; }
     .lightbox img {
-      max-width: min(92vw, 1200px);
-      max-height: 92vh;
+      max-width: min(94vw, 1400px);
+      max-height: 94vh;
       border-radius: 18px;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
       object-fit: contain;
       background: #fff;
     }
@@ -203,23 +204,23 @@
           photos.appendChild(none);
         } else {
           names.forEach((n) => {
-            const link = document.createElement('a');
-            link.href = `/uploads/${n}`;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
+            const wrap = document.createElement('div');
+            wrap.className = 'thumb-wrap';
             const img = document.createElement('img');
             img.className = 'thumb';
             img.src = `/uploads/${n}`;
             img.alt = n;
-            link.appendChild(img);
 
-            link.addEventListener('click', (e) => {
-              if (e.metaKey || e.ctrlKey || e.button === 1) return; // allow new-tab shortcuts
-              e.preventDefault();
-              openLightbox(link.href);
+            wrap.addEventListener('click', (e) => {
+              if (e.metaKey || e.ctrlKey || e.button === 1) {
+                window.open(`/uploads/${n}`, '_blank', 'noopener');
+                return;
+              }
+              openLightbox(`/uploads/${n}`);
             });
 
-            photos.appendChild(link);
+            wrap.appendChild(img);
+            photos.appendChild(wrap);
           });
         }
 
@@ -239,6 +240,13 @@
     lightbox.addEventListener('click', () => {
       lightbox.classList.remove('open');
       lightboxImg.src = '';
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.classList.contains('open')) {
+        lightbox.classList.remove('open');
+        lightboxImg.src = '';
+      }
     });
   </script>
 </body>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>화분 간단 등록</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: linear-gradient(145deg, #f9f7f1 0%, #e4f3f0 40%, #d8e8ff 100%);
+      --card: #ffffff;
+      --accent: #0f766e;
+      --accent-2: #ff6b35;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --shadow: 0 20px 50px rgba(17, 24, 39, 0.12);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--text);
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blobs::before,
+    .blobs::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.35;
+      animation: float 16s ease-in-out infinite;
+    }
+
+    .blobs::before {
+      width: 260px;
+      height: 260px;
+      background: #a5f3fc;
+      top: -60px;
+      left: -40px;
+    }
+
+    .blobs::after {
+      width: 320px;
+      height: 320px;
+      background: #fde68a;
+      bottom: -80px;
+      right: -60px;
+      animation-delay: 4s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-18px); }
+    }
+
+    .card {
+      position: relative;
+      width: min(420px, 100%);
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(6px);
+      z-index: 1;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      box-shadow: 0 0 0 6px rgba(255, 107, 53, 0.15);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .sub {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .upload {
+      border: 1px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 14px;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .upload:hover { border-color: var(--accent); }
+
+    .upload strong {
+      color: var(--accent);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      background: #ecfeff;
+      color: #0e7490;
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      border: 1px solid #bae6fd;
+    }
+
+    .input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 15px;
+      background: #f9fafb;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+    }
+
+    .toggle {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--muted);
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pill.active {
+      background: #0f766e;
+      color: #ecfeff;
+      border-color: #0f766e;
+      box-shadow: 0 10px 30px rgba(15, 118, 110, 0.22);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 18px 0 8px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: #f8fafc;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+    }
+
+    .item h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 11px;
+      background: #ecfeff;
+      color: #0e7490;
+      border: 1px solid #bae6fd;
+    }
+
+    .photos {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .refresh {
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .primary {
+      background: linear-gradient(120deg, #0f766e, #0ea5e9);
+      color: #ecfeff;
+      box-shadow: 0 14px 30px rgba(14, 165, 233, 0.25);
+      width: 100%;
+    }
+
+    .primary:active { transform: translateY(1px); }
+
+    .toast {
+      display: none;
+      margin-top: -4px;
+      color: #047857;
+      background: #ecfdf3;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .error {
+      color: #b91c1c;
+      background: #fef2f2;
+      border: 1px solid #fecdd3;
+    }
+
+    @media (max-width: 520px) {
+      .card { padding: 18px; }
+      h1 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body class="blobs">
+  <div class="card">
+    <div class="header">
+      <div class="dot"></div>
+      <div>
+        <h1>축하 화분 등록</h1>
+        <p class="sub">가격이나 종류는 생략하고, 꼭 필요한 정보만 빠르게 입력하세요.</p>
+      </div>
+    </div>
+
+    <form id="potForm" novalidate>
+      <div class="field">
+        <label>
+          사진 업로드 <span class="hint">최대 5장</span>
+        </label>
+        <label class="upload" for="photos">
+          <strong>이미지 선택</strong>
+          <span class="hint">가볍게 올리고, 바로 등록하세요.</span>
+        </label>
+        <input id="photos" type="file" accept="image/*" multiple>
+        <div class="chips" id="chips"></div>
+      </div>
+
+      <div class="field">
+        <label>화분 수량</label>
+        <input class="input" type="number" id="qty" name="qty" min="1" placeholder="몇 개나 받으셨나요?" required>
+      </div>
+
+      <div class="field">
+        <label>위치</label>
+        <input class="input" type="text" id="location" name="location" placeholder="동네 또는 주소" required>
+      </div>
+
+      <div class="field">
+        <label>선택</label>
+        <div class="toggle" id="offerToggle">
+          <div class="pill active" data-value="take">그냥 가져가세요</div>
+          <div class="pill" data-value="open">제안 받아요</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" type="submit">등록하기</button>
+      </div>
+      <div class="toast" id="toast">등록 완료! 곧 연락을 받아보세요.</div>
+      <div class="toast error" id="errorToast">필수 항목을 확인해 주세요.</div>
+    </form>
+
+    <div class="section-title">
+      <span>최근 등록</span>
+      <button type="button" class="refresh" id="refreshList">새로고침</button>
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+
+  <script>
+    const photos = document.getElementById('photos');
+    const chips = document.getElementById('chips');
+    const form = document.getElementById('potForm');
+    const toast = document.getElementById('toast');
+    const errorToast = document.getElementById('errorToast');
+    const toggle = document.getElementById('offerToggle');
+    const list = document.getElementById('list');
+    const refreshBtn = document.getElementById('refreshList');
+    const MAX_FILES = 5;
+    const MAX_SIZE = 5 * 1024 * 1024;
+    let intent = 'take';
+    let files = [];
+
+    toggle.addEventListener('click', (e) => {
+      const pill = e.target.closest('.pill');
+      if (!pill) return;
+      toggle.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      intent = pill.dataset.value;
+    });
+
+    refreshBtn.addEventListener('click', fetchList);
+
+    photos.addEventListener('change', (e) => {
+      const selected = Array.from(e.target.files || []);
+      const invalid = selected.find(f => !f.type.startsWith('image/'));
+      const tooLarge = selected.find(f => f.size > MAX_SIZE);
+      if (invalid) {
+        showError('이미지 파일만 업로드 가능합니다.');
+        photos.value = '';
+        return;
+      }
+      if (tooLarge) {
+        showError('각 사진은 5MB 이하만 가능합니다.');
+        photos.value = '';
+        return;
+      }
+
+      const merged = [...files, ...selected].slice(0, MAX_FILES);
+      if (selected.length + files.length > MAX_FILES) {
+        showError('사진은 최대 5장까지 업로드 가능합니다.');
+      }
+      files = merged;
+      renderChips();
+      photos.value = '';
+    });
+
+    function renderChips() {
+      chips.innerHTML = '';
+      files.forEach((file) => {
+        const div = document.createElement('div');
+        div.className = 'chip';
+        div.textContent = file.name;
+        chips.appendChild(div);
+      });
+    }
+
+    async function fetchList() {
+      list.innerHTML = '<span class="hint">불러오는 중...</span>';
+      try {
+        const res = await fetch('/api/pots');
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || '조회 실패');
+        renderList(data.data || []);
+      } catch (err) {
+        list.innerHTML = `<span class="hint">${err.message || '목록을 불러오지 못했습니다.'}</span>`;
+      }
+    }
+
+    function renderList(items) {
+      if (!items.length) {
+        list.innerHTML = '<span class="hint">아직 등록된 화분이 없습니다.</span>';
+        return;
+      }
+
+      list.innerHTML = '';
+      items.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'item';
+
+        const title = document.createElement('h3');
+        title.textContent = `${item.location} · ${item.qty}개`;
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = item.intent === 'open' ? '제안 받아요' : '그냥 가져가세요';
+        const date = document.createElement('span');
+        date.textContent = new Date(item.created_at).toLocaleString();
+        meta.appendChild(badge);
+        meta.appendChild(date);
+
+        const photoWrap = document.createElement('div');
+        photoWrap.className = 'photos';
+        let photoNames = [];
+        try {
+          photoNames = JSON.parse(item.photos || '[]');
+        } catch (_) {
+          photoNames = [];
+        }
+        if (!Array.isArray(photoNames)) photoNames = [];
+
+        if (photoNames.length === 0) {
+          const noImg = document.createElement('span');
+          noImg.className = 'hint';
+          noImg.textContent = '사진 없음';
+          photoWrap.appendChild(noImg);
+        } else {
+          photoNames.forEach((name) => {
+            const img = document.createElement('img');
+            img.className = 'thumb';
+            img.src = `/uploads/${name}`;
+            img.alt = name;
+            photoWrap.appendChild(img);
+          });
+        }
+
+        div.appendChild(title);
+        div.appendChild(meta);
+        div.appendChild(photoWrap);
+        list.appendChild(div);
+      });
+    }
+
+    function showError(msg) {
+      errorToast.textContent = msg;
+      errorToast.style.display = 'block';
+      toast.style.display = 'none';
+      setTimeout(() => { errorToast.style.display = 'none'; }, 2500);
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorToast.style.display = 'none';
+      toast.style.display = 'none';
+
+      const qty = Number(document.getElementById('qty').value);
+      const location = document.getElementById('location').value.trim();
+
+      if (!qty || qty < 1 || !location) {
+        showError('필수 항목을 확인해 주세요.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('qty', qty.toString());
+      formData.append('location', location);
+      formData.append('intent', intent);
+      files.forEach((file) => formData.append('photos', file));
+
+      try {
+        const res = await fetch('/api/pots', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          throw new Error(data.message || '저장에 실패했습니다.');
+        }
+      } catch (err) {
+        showError(err.message || '저장에 실패했습니다.');
+        return;
+      }
+
+      form.reset();
+      files = [];
+      intent = 'take';
+      toggle.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      toggle.querySelector('[data-value="take"]').classList.add('active');
+      renderChips();
+      fetchList();
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 2600);
+    });
+
+    fetchList();
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "flower-platform",
+  "version": "0.0.1",
+  "description": "MVP for quick plant/flower pot registration",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "multer": "^2.0.0",
+    "sqlite3": "^5.1.6"
+  }
+}

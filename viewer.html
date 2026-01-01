@@ -178,11 +178,16 @@
           photos.appendChild(none);
         } else {
           names.forEach((n) => {
+            const link = document.createElement('a');
+            link.href = `/uploads/${n}`;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
             const img = document.createElement('img');
             img.className = 'thumb';
             img.src = `/uploads/${n}`;
             img.alt = n;
-            photos.appendChild(img);
+            link.appendChild(img);
+            photos.appendChild(link);
           });
         }
 
